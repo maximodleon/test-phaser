@@ -1,11 +1,19 @@
 let game
+let gameOptions = {
+  tileSize: 200,
+  tileSpacing: 20,
+  boardSize: {
+    rows: 4,
+    cols: 4
+  }
+}
 
 window.onload = function() {
  let config = {
-  width: 480,
-  height: 640,
-  backgroundColor: 0xff0000,
-  scene: [ bootGame, playGame ]
+  width: gameOptions.boardSize.cols * (gameOptions.tileSize + gameOptions.tileSpacing) + gameOptions.tileSpacing,
+  height: gameOptions.boardSize.rows * (gameOptions.tileSize + gameOptions.tileSpacing) + gameOptions.tileSpacing,
+  backgroundColor: 0xecf0f1,
+  scene: [ BootGame, PlayGame ]
  }
 
  game = new Phaser.Game(config)
@@ -31,24 +39,39 @@ function resizeGame() {
 }
 
 // Scene classes
-class playGame extends Phaser.Scene {
+class PlayGame extends Phaser.Scene {
    constructor() {
       super('PlayGame')
    }
 
     create() {
-      console.log('this is my awesome game')
+      for (let i=0; i < gameOptions.boardSize.rows; i++) {
+       for (let j=0; j < gameOptions.boardSize.cols; j++) {
+           let tilePosition = this.getTilePosition(i, j)
+           this.add.image(tilePosition.x, tilePosition.y, 'emptytile')
+          }
+        }
+    }
+
+    getTilePosition(row, col) {
+      let posX = gameOptions.tileSpacing * (col + 1) + gameOptions.tileSize * (col + 0.5)
+      let posY = gameOptions.tileSpacing * (row + 1) + gameOptions.tileSize * (row + 0.5)
+
+      return new Phaser.Geom.Point(posX, posY)
     }
 }
 
-class bootGame extends Phaser.Scene {
+class BootGame extends Phaser.Scene {
 
   constructor() {
     super('BootGame') 
   }
 
+  preload(){
+   this.load.image('emptytile', 'assets/sprites/emptytile.png')
+  }
+
   create() {
-    console.log('game is booting...')
     this.scene.start('PlayGame')
   }
 }
